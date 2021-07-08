@@ -8,15 +8,17 @@ import {StyleSheet, Image, Text, View} from 'react-native';
 import CheckOutlineLogo from '../../../assets/images/check-outline.svg';
 import LikeOutlineLogo from '../../../assets/images/like-outline.svg';
 import {detail, participantsType, likesType} from '../../../types/types';
+import {BORDER_COLOR, TEXT_NORMAL_LIGHT} from '../../../styles';
 
-interface DetailParticipantsProps {
+export default function DetailParticipants({
+  detail,
+  participants,
+  likes,
+}: {
   detail: detail;
   participants: Array<participantsType>;
   likes: Array<likesType>;
-}
-
-export default function DetailParticipants(props: DetailParticipantsProps) {
-  const {detail, participants, likes} = props;
+}) {
   const participantsList =
     participants &&
     participants.map((item, index) => {
@@ -76,7 +78,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   timeWraper: {
-    display: 'flex',
     flexDirection: 'row',
     width: 70,
     height: 35,
@@ -89,7 +90,7 @@ const styles = StyleSheet.create({
   },
   ItemGoingText: {
     fontSize: 12,
-    color: '#AC8EC9',
+    color: TEXT_NORMAL_LIGHT,
   },
   goingWrapper: {
     flexDirection: 'row',
@@ -97,7 +98,7 @@ const styles = StyleSheet.create({
   likesWrapper: {
     flexDirection: 'row',
     borderTopWidth: 1,
-    borderTopColor: '#E8E8E8',
+    borderTopColor: BORDER_COLOR,
     paddingTop: 12,
   },
   goingImage: {

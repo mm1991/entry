@@ -4,6 +4,7 @@ import {StyleSheet, SafeAreaView} from 'react-native';
 import {Provider} from 'mobx-react';
 import {stores} from './store';
 import Navigation from './navigation';
+import {BACK_WHITE} from './styles';
 
 export default function App() {
   return (
@@ -18,6 +19,6 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: BACK_WHITE,
   },
 });

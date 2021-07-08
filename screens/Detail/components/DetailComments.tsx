@@ -5,15 +5,11 @@
 import * as React from 'react';
 import {StyleSheet, Image, Text, View} from 'react-native';
 import Reply from '../../../assets/images/reply.svg';
-import {calDurationText} from '../../../utils/public';
+import {calDurationText} from '../../../utils/formatTime';
 import {commentType} from '../../../types/types';
+import {BORDER_COLOR, TEXT_PURPLE, TEXT_GREY} from '../../../styles';
 
-interface DetailProps {
-  comments: Array<commentType>;
-}
-
-export default function Detail(props: DetailProps) {
-  const {comments} = props;
+export default function Detail({comments}: {comments: Array<commentType>}) {
   const commentsList =
     comments &&
     comments.length > 0 &&
@@ -51,7 +47,7 @@ const styles = StyleSheet.create({
     paddingTop: 8,
     paddingBottom: 20,
     borderTopWidth: 1,
-    borderTopColor: '#E8E8E8',
+    borderTopColor: BORDER_COLOR,
   },
   commentsWrapper: {
     flexDirection: 'row',
@@ -78,11 +74,11 @@ const styles = StyleSheet.create({
     paddingBottom: 4,
   },
   author: {
-    color: '#8560A9',
+    color: TEXT_PURPLE,
     fontSize: 12,
   },
   authorTime: {
-    color: '#bababa',
+    color: TEXT_GREY,
     fontSize: 10,
     paddingLeft: 12,
     paddingTop: 2,

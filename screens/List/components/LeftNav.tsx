@@ -9,8 +9,28 @@ import ChannelList from './ChannelList';
 import TimeList from './TimeList';
 import SearchButton from './SearchButton';
 import {channelType} from '../../../types/types';
+import {PURPLE, BACKGROUND_PURPLE, TEXT_NORMAL_LIGHT} from '../../../styles';
 
-interface LeftNavProps {
+const titleView = (text: string) => {
+  return (
+    <View style={styles.title}>
+      <View style={styles.selectTypeWrapper}>
+        <Text style={styles.selectType}>{text}</Text>
+      </View>
+    </View>
+  );
+};
+
+export default function LeftNav({
+  selecedTime,
+  onSelectTime,
+  channelData,
+  selecedChannel,
+  onSelectChannel,
+  submitSearch,
+  searchActive,
+  searchText,
+}: {
   selecedTime: number;
   onSelectTime: Function;
   channelData: Array<channelType>;
@@ -19,39 +39,22 @@ interface LeftNavProps {
   submitSearch: Function;
   searchActive: boolean;
   searchText: string;
-}
-
-export default function LeftNav(props: LeftNavProps) {
+}) {
   return (
-    <View
-      style={[
-        styles.navContainer,
-        {
-          height: Dimensions.get('window').height,
-        },
-      ]}
-    >
-      <View style={styles.title}>
-        <View style={styles.selectTypeWrapper}>
-          <Text style={styles.selectType}>DATE</Text>
-        </View>
-      </View>
-      <TimeList seleced={props.selecedTime} onSelectTime={props.onSelectTime} />
-      <View style={styles.title}>
-        <View style={styles.selectTypeWrapper}>
-          <Text style={styles.selectType}>CHANNEL</Text>
-        </View>
-      </View>
+    <View style={[styles.navContainer]}>
+      {titleView('DATE')}
+      <TimeList seleced={selecedTime} onSelectTime={onSelectTime} />
+      {titleView('CHANNEL')}
 
       <ChannelList
-        channelData={props.channelData}
-        seleced={props.selecedChannel}
-        onSelectChannel={props.onSelectChannel}
+        channelData={channelData}
+        seleced={selecedChannel}
+        onSelectChannel={onSelectChannel}
       />
       <SearchButton
-        submitSearch={props.submitSearch}
-        searchActive={props.searchActive}
-        searchText={props.searchText}
+        submitSearch={submitSearch}
+        searchActive={searchActive}
+        searchText={searchText}
       />
     </View>
   );
@@ -63,10 +66,11 @@ const styles = StyleSheet.create({
     left: 0,
     top: 0,
     width: 240,
-    backgroundColor: '#453257',
+    backgroundColor: PURPLE,
     paddingTop: 10,
     paddingLeft: 14,
     zIndex: 1,
+    height: Dimensions.get('window').height,
   },
   title: {
     justifyContent: 'center',
@@ -74,11 +78,11 @@ const styles = StyleSheet.create({
   },
   selectTypeWrapper: {
     borderBottomWidth: 1,
-    borderBottomColor: '#8560A9',
+    borderBottomColor: BACKGROUND_PURPLE,
     marginBottom: 13,
   },
   selectType: {
-    color: '#AC8EC9',
+    color: TEXT_NORMAL_LIGHT,
     fontSize: 12,
     fontWeight: 'bold',
   },

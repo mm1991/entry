@@ -3,22 +3,42 @@
  */
 
 import * as React from 'react';
+import {StackScreenProps} from '@react-navigation/stack';
 import {StyleSheet, ImageBackground, Text, View} from 'react-native';
 import LogoCat from '../../assets/images/logo-cat.svg';
 import Form from './components/Form';
-import loginBack from '../../assets/images/Street-Dance-01.jpg';
 // 多语言函数
 import {i18nT} from '../../i18n';
 import SwitchLang from '../../components/SwitchLang';
-import {Observer} from 'mobx-react';
+import {Observer, useLocalObservable} from 'mobx-react';
+import {RootStackParamList} from '../../types/types';
+import ImageBack from '../../assets/images/Street-Dance-01.jpg';
+import {loginApi, joinApi} from '../../utils/api';
+import {setStorage} from '../../utils/storage';
+import {stores} from '../../store';
+import {GREEN, BACKGROUND_PURPLE} from '../../styles';
 
-export default function Login({navigation}: {navigation: any}) {
+export default function Login({
+  navigation,
+}: StackScreenProps<RootStackParamList, 'Login'>) {
+  const store = useLocalObservable(() => stores);
+  // 提交登录
+  const handleSubmit = async data => {
+    const res = await loginApi(data);
+    // const res = await joinApi(data);
+    if (res) {
+      // 将token存入store和本地存储中
+      setStorage('userdata', res);
+      store.setUserData(res);
+      navigation.push('List');
+    }
+  };
   return (
     <Observer>
       {() => (
         <View style={styles.container}>
           <SwitchLang />
-          <ImageBackground source={loginBack} style={styles.image}>
+          <ImageBackground source={ImageBack} style={styles.image}>
             <View style={styles.imageBg}></View>
             <Text style={styles.loginText1}>{i18nT('slogan')}</Text>
             <Text style={styles.loginText2}>{i18nT('name')}</Text>
@@ -27,7 +47,7 @@ export default function Login({navigation}: {navigation: any}) {
             </View>
           </ImageBackground>
           <View style={styles.formWrapper}>
-            <Form navigation={navigation}></Form>
+            <Form handleSubmit={handleSubmit}></Form>
           </View>
         </View>
       )}
@@ -43,7 +63,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     width: '100%',
     height: '100%',
-    backgroundColor: '#8560A9',
+    backgroundColor: BACKGROUND_PURPLE,
     opacity: 0.8,
   },
   title: {
@@ -57,14 +77,14 @@ const styles = StyleSheet.create({
   },
   loginText1: {
     marginTop: 70,
-    color: '#D5EF7F',
+    color: GREEN,
     fontSize: 16,
     fontWeight: 'bold',
     textAlign: 'center',
   },
   loginText2: {
     marginTop: 35,
-    color: '#D5EF7F',
+    color: GREEN,
     fontSize: 24,
     fontWeight: 'bold',
     textAlign: 'center',
@@ -90,7 +110,7 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderWidth: 1,
-    borderColor: '#D5EF7F',
+    borderColor: GREEN,
     borderRadius: 64,
     marginLeft: -32,
   },

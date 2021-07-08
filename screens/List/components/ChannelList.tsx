@@ -5,37 +5,34 @@
 import React from 'react';
 import {Text, View, StyleSheet} from 'react-native';
 import {channelType} from '../../../types/types';
+import {PURPLE, BORDER_PURPLE, ACTIVE_GREEN} from '../../../styles';
 
-interface ChannelListProps {
+export default function ChannelList({
+  channelData,
+  seleced,
+  onSelectChannel,
+}: {
   channelData: Array<channelType>;
   seleced: number;
   onSelectChannel: Function;
-}
-
-export default function ChannelList(props: ChannelListProps) {
-  const channels = props.channelData || [];
+}) {
+  const channels = channelData || [];
   const channelNodes = channels.map(channel => {
     return (
       <View
         style={[
           styles.labelContainer,
-          props.seleced === channel.id && {
-            backgroundColor: '#E5F7A9',
-            borderColor: '#E5F7A9',
-          },
+          seleced === channel.id && styles.labelContainerActive,
         ]}
         key={channel.id}
       >
         <Text
           style={[
             styles.selectChannel,
-            props.seleced === channel.id && {
-              color: '#453257',
-              fontWeight: 'bold',
-            },
+            seleced === channel.id && styles.channelTextActive,
           ]}
           onPress={() => {
-            props.onSelectChannel({
+            onSelectChannel({
               id: channel.id,
               name: channel.name,
             });
@@ -56,10 +53,14 @@ const styles = StyleSheet.create({
   },
   labelContainer: {
     borderRadius: 15,
-    borderColor: '#D3C1E5',
+    borderColor: BORDER_PURPLE,
     borderWidth: 1,
     marginRight: 12,
     marginBottom: 9,
+  },
+  labelContainerActive: {
+    backgroundColor: ACTIVE_GREEN,
+    borderColor: ACTIVE_GREEN,
   },
   selectChannel: {
     color: '#fff',
@@ -67,5 +68,9 @@ const styles = StyleSheet.create({
     paddingLeft: 10,
     paddingRight: 10,
     fontSize: 12,
+  },
+  channelTextActive: {
+    color: PURPLE,
+    fontWeight: 'bold',
   },
 });

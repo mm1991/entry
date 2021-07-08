@@ -1,65 +1,73 @@
 import React from 'react';
-import {Image, View, TouchableHighlight, StyleSheet, Text} from 'react-native';
+import {Image, View, TouchableHighlight, StyleSheet, Alert} from 'react-native';
 import LogoCat from '../assets/images/logo-cat.svg';
-import Home from '../assets/images/home.svg';
+import HomeImg from '../assets/images/home.svg';
 import LogoSearch from '../assets/images/search.svg';
 import {stores} from '../store';
 import {Observer, useLocalObservable} from 'mobx-react';
+import {BACKGROUND_PURPLE} from '../styles';
 
-interface headerProps {
-  switchNav?: Function;
-  navigation?: any;
-  Home: boolean;
-}
-
-export default function Header(props: headerProps) {
-  const store = useLocalObservable(() => stores);
-  const userData = store.userData;
-  const userImage = userData && userData.user && userData.user.avatar;
-  return (
-    <Observer>
-      {() => (
-        <View style={styles.HeaderContainer}>
-          {!props.Home && (
+const Header = React.memo(
+  ({
+    switchNav,
+    navigation,
+    Home,
+  }: {
+    switchNav?: Function;
+    navigation?: any;
+    Home: boolean;
+  }) => {
+    const store = useLocalObservable(() => stores);
+    const userData = store.userData;
+    const homePress = () => {
+      if (!Home) {
+        switchNav && switchNav(240);
+      } else {
+        navigation.goBack();
+      }
+    };
+    return (
+      <Observer>
+        {() => (
+          <View style={styles.HeaderContainer}>
             <TouchableHighlight
-              onPress={() => props.switchNav && props.switchNav(240)}
+              onPress={() => {
+                homePress();
+              }}
             >
               <View style={styles.searchWrapper}>
-                <LogoSearch style={styles.searchImage} />
+                {!Home ? (
+                  <LogoSearch style={styles.searchImage} />
+                ) : (
+                  <HomeImg style={styles.searchImage} />
+                )}
               </View>
             </TouchableHighlight>
-          )}
-          {props.Home && (
-            <TouchableHighlight onPress={() => props.navigation.goBack()}>
-              <View style={styles.searchWrapper}>
-                <Home style={styles.searchImage} />
-              </View>
-            </TouchableHighlight>
-          )}
-          <LogoCat style={styles.loginImage} />
-          {!!userImage && (
-            <TouchableHighlight
-              style={styles.avadarImageWrapper}
-              onPress={() => props.navigation.navigate('User')}
-            >
-              <Image
-                source={{
-                  uri: userImage,
-                }}
-                style={styles.avadarImage}
-              />
-            </TouchableHighlight>
-          )}
-        </View>
-      )}
-    </Observer>
-  );
-}
+            <LogoCat style={styles.loginImage} />
+            {!!userData.user.avatar && (
+              <TouchableHighlight
+                style={styles.avadarImageWrapper}
+                onPress={() => navigation.navigate('User')}
+              >
+                <Image
+                  source={{
+                    uri: userData.user.avatar,
+                  }}
+                  style={styles.avadarImage}
+                />
+              </TouchableHighlight>
+            )}
+          </View>
+        )}
+      </Observer>
+    );
+  }
+);
 
 const styles = StyleSheet.create({
   HeaderContainer: {
     height: 40,
-    backgroundColor: '#8560A9',
+    backgroundColor: BACKGROUND_PURPLE,
     width: '100%',
     zIndex: 4,
   },
@@ -94,3 +102,5 @@ const styles = StyleSheet.create({
     top: 0,
   },
 });
+
+export default Header;

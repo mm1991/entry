@@ -10,10 +10,10 @@ import * as React from 'react';
 import NotFoundScreen from '../screens/NotFoundScreen';
 import {RootStackParamList} from '../types/types';
 import LinkingConfiguration from './LinkingConfiguration';
-import List from '../screens/List/List';
-import Login from '../screens/Login/Login';
-import Detail from '../screens/Detail/Detail';
-import User from '../screens/User/User';
+import List from '../screens/List';
+import Login from '../screens/Login';
+import Detail from '../screens/Detail';
+import User from '../screens/User';
 import {navigationRef} from '../RootNavigation';
 
 export default function Navigation() {

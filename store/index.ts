@@ -6,7 +6,9 @@ class Store {
   constructor() {
     makeObservable(this);
   }
+  // 活动列表
   @observable events: Array<eventsType> = [];
+  // 用户信息
   @observable userData: userDataType = {
     token: '',
     user: {
@@ -14,24 +16,31 @@ class Store {
       username: '',
     },
   };
-  @observable channelData: Array<Object> = [];
+  // channel列表
+  @observable channelData: Array<channelType> = [];
+
+  // 筛选选中信息
+  // 当前选中的channel
   @observable selectChannel: channelType = {
     id: -1,
     name: '',
   };
+  // 当前选中的时间区域
   @observable selectTime = -1;
+  // LATER 开始时间
   @observable startTime: number = new Date().getTime();
+  // LATER 结束时间
   @observable endTime: number = new Date().getTime();
+  // 语言
   @observable lang = 'zh';
 
-  // 使用@action 更改被观察者
   @action.bound setEvents(data: Array<eventsType>) {
     this.events = data;
   }
   @action.bound setUserData(data: userDataType) {
     this.userData = data;
   }
-  @action.bound setChannelData(data: Array<Object>) {
+  @action.bound setChannelData(data: Array<channelType>) {
     this.channelData = data;
   }
   @action.bound setSelectChannel(data: channelType) {

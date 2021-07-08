@@ -8,12 +8,16 @@ import Header from '../../components/Header';
 import UserInfo from './components/UserInfo';
 import UserTab from './components/UserTab';
 import ListItem from '../../components/ListItem';
-import {get} from '../../utils/request';
 import EmptyPage from '../../components/EmptyPage';
-import {userInfoType} from '../../types/types';
+import {userInfoType, eventsType, RootStackParamList} from '../../types/types';
 import {defualtAvatar} from '../../globalConfig';
+import {getUserApi, getUserEventApi} from '../../utils/api';
+import {StackScreenProps} from '@react-navigation/stack';
+import {GREEN, BACKGROUND_PURPLE, BACK_WHITE} from '../../styles';
 
-export default function User({navigation}: {navigation: any}) {
+export default function User({
+  navigation,
+}: StackScreenProps<RootStackParamList, 'User'>) {
   const [userData, setUserData] = useState<userInfoType>({
     avatar: defualtAvatar,
     email: '',
@@ -28,28 +32,32 @@ export default function User({navigation}: {navigation: any}) {
 
   // 获取个人信息
   const getUser = async () => {
-    const res = await get('/user');
-    setUserData(res);
+    const res = await getUserApi();
+    res && setUserData(res);
   };
 
   // 获取我的liked || going || comments数据
   const getUserEvent = async (type: string) => {
-    const res = await get('/user/events', {
+    const res = await getUserEventApi({
       type,
     });
-    setEvents(res.events);
-    setHasMore(res.hasMore);
+    if (res) {
+      setEvents(res.events);
+      setHasMore(res.hasMore);
+    }
   };
 
   // 加载更多 - 获取我的liked || going || comments数据
   const getMoreList = async (type: string) => {
     if (hasMore) {
-      const res = await get('/user/events', {
+      const res = await getUserEventApi({
         type,
         offset: events.length,
       });
-      setEvents(events.concat(res.events));
-      setHasMore(res.hasMore);
+      if (res) {
+        setEvents(events.concat(res.events));
+        setHasMore(res.hasMore);
+      }
     }
   };
 
@@ -62,9 +70,9 @@ export default function User({navigation}: {navigation: any}) {
     getUserEvent(eventType);
   }, [eventType]);
 
-  const renderItem = ({item, index}) => {
+  const renderItem = ({item, index}: {item: eventsType; index: number}) => {
     return (
-      <ListItem item={item} index={index} key={index} navigation={navigation} />
+      <ListItem {...item} index={index} key={index} navigation={navigation} />
     );
   };
   return (
@@ -79,12 +87,14 @@ export default function User({navigation}: {navigation: any}) {
       <FlatList
         data={events}
         renderItem={renderItem}
-        keyExtractor={(item, index) => index.toString()}
+        keyExtractor={(item, index) => item.id.toString()}
         onEndReachedThreshold={0.1}
         onEndReached={() => {
           getMoreList(eventType);
         }}
         ListEmptyComponent={EmptyPage}
+        windowSize={5}
+        initialNumToRender={3}
       />
     </View>
   );
@@ -93,11 +103,11 @@ export default function User({navigation}: {navigation: any}) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: BACK_WHITE,
   },
   imageBg: {
     flex: 1,
-    backgroundColor: '#8560A9',
+    backgroundColor: BACKGROUND_PURPLE,
     opacity: 0.7,
   },
   title: {
@@ -112,7 +122,7 @@ const styles = StyleSheet.create({
   loginText1: {
     position: 'absolute',
     top: 70,
-    color: '#D5EF7F',
+    color: GREEN,
     fontSize: 16,
     fontWeight: 'bold',
     left: '50%',
@@ -122,7 +132,7 @@ const styles = StyleSheet.create({
   loginText2: {
     position: 'absolute',
     top: 105,
-    color: '#D5EF7F',
+    color: GREEN,
     fontSize: 24,
     fontWeight: 'bold',
     left: '50%',
@@ -150,7 +160,7 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderWidth: 1,
-    borderColor: '#D5EF7F',
+    borderColor: GREEN,
     borderRadius: 64,
     marginLeft: -32,
   },

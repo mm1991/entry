@@ -3,7 +3,8 @@
  */
 
 // 根据start和end输入的时间计算时间戳
-const getLater = (start: number, end: number) => {
+const current = new Date().getTime();
+const getLater = (start: number = current, end: number = current) => {
   const startTs = new Date(start).getTime(); // 开始时间为当天开始时间
   const endTs = new Date(end).getTime() + 1000 * 60 * 60 * 24; // 结束的时间为结束日期的结束时间
   return {before: endTs, after: startTs};

@@ -4,25 +4,28 @@
 
 import React from 'react';
 import {Text, View, TouchableOpacity, StyleSheet} from 'react-native';
+import {GREEN, TEXT_PURPLE, TEXT_NORMAL} from '../../../styles';
 
-interface SearchResultProps {
+export default function SearchResult({
+  searchCount,
+  searchText,
+  clearSearch,
+}: {
   searchCount: number;
   searchText: string;
   clearSearch: Function;
-}
-
-export default function SearchResult(props: SearchResultProps) {
+}) {
   return (
     <View style={styles.resultContainer}>
       <View style={styles.topWrapper}>
-        <Text style={styles.resultText}>{props.searchCount} Result</Text>
-        <TouchableOpacity onPress={() => props.clearSearch()}>
+        <Text style={styles.resultText}>{searchCount} Result</Text>
+        <TouchableOpacity onPress={() => clearSearch()}>
           <View style={styles.btnWrapper}>
             <Text style={styles.btnText}>CLEAR SEARCH</Text>
           </View>
         </TouchableOpacity>
       </View>
-      <Text style={styles.bottomText}>Searched for {props.searchText}</Text>
+      <Text style={styles.bottomText}>Searched for {searchText}</Text>
     </View>
   );
 }
@@ -42,24 +45,24 @@ const styles = StyleSheet.create({
     paddingBottom: 6,
   },
   resultText: {
-    color: '#8560A9',
+    color: TEXT_PURPLE,
     fontSize: 16,
     fontWeight: 'bold',
   },
   btnWrapper: {
     paddingLeft: 10,
     paddingRight: 10,
-    backgroundColor: '#D5EF7F',
+    backgroundColor: GREEN,
     borderRadius: 22,
   },
   btnText: {
     fontSize: 10,
-    color: '#67616D',
+    color: TEXT_NORMAL,
     lineHeight: 22,
     fontWeight: 'bold',
   },
   bottomText: {
-    color: '#67616D',
+    color: TEXT_NORMAL,
     fontSize: 12,
   },
 });

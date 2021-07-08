@@ -18,15 +18,22 @@ import CheckBig from '../../../assets/images/check-big.svg';
 import Cross from '../../../assets/images/cross.svg';
 import Send from '../../../assets/images/send.svg';
 import {detail} from '../../../types/types';
+import {
+  GREEN,
+  BACKGROUND_PURPLE,
+  BACK_WHITE,
+  BORDER_PURPLE,
+} from '../../../styles';
 
-interface DetaiFooterlProps {
+export default function DetailFooter({
+  detail,
+  submitComments,
+  chooseLikeGoing,
+}: {
   detail: detail;
   submitComments: Function;
   chooseLikeGoing: Function;
-}
-
-export default function DetailFooter(props: DetaiFooterlProps) {
-  const {detail} = props;
+}) {
   const [submitComment, setSubmitComment] = useState(false);
   const [value, setValue] = useState<string>('');
 
@@ -41,14 +48,15 @@ export default function DetailFooter(props: DetaiFooterlProps) {
   };
 
   // 提交评论
-  const submitComments = () => {
-    props.submitComments(value);
+  const submitCommentsActive = () => {
+    submitComments(value);
     setSubmitComment(false);
   };
   return (
     <View>
-      {submitComment && (
+      {submitComment ? (
         <View style={styles.footer}>
+          {/* 关闭评论 */}
           <TouchableOpacity
             onPress={() => {
               closeComment();
@@ -56,26 +64,27 @@ export default function DetailFooter(props: DetaiFooterlProps) {
           >
             <Cross style={styles.crossImage} />
           </TouchableOpacity>
-
+          {/* 评论输入框 */}
           <TextInput
             style={styles.inputStyle}
             placeholder={'Leave your comment here'}
-            placeholderTextColor={'#D3C1E5'}
+            placeholderTextColor={BORDER_PURPLE}
             onChangeText={value => setValue(value)}
           />
+          {/* 提交评论 */}
           <TouchableOpacity
             style={styles.sendButton}
             onPress={() => {
-              submitComments();
+              submitCommentsActive();
             }}
           >
             <Send style={styles.sendImage} />
           </TouchableOpacity>
         </View>
-      )}
-      {!submitComment && (
+      ) : (
         <View style={styles.footer}>
           <View style={styles.ImageWrapper}>
+            {/* 评论按钮 */}
             <TouchableOpacity
               onPress={() => {
                 openComment();
@@ -83,58 +92,48 @@ export default function DetailFooter(props: DetaiFooterlProps) {
             >
               <CommentSingle style={styles.footerImage} />
             </TouchableOpacity>
-            {!detail.me_likes && (
-              <TouchableOpacity
-                onPress={() => {
-                  props.chooseLikeGoing(0, 'likes', detail.id, true);
-                }}
-              >
+            {/* likes按钮 */}
+            <TouchableOpacity
+              onPress={() => {
+                chooseLikeGoing(0, 'likes', detail.id, !detail.me_likes);
+              }}
+            >
+              {!detail.me_likes ? (
                 <LikeDetail style={styles.footerImage} />
-              </TouchableOpacity>
-            )}
-            {detail.me_likes && (
-              <TouchableOpacity
-                onPress={() => {
-                  props.chooseLikeGoing(0, 'likes', detail.id, false);
-                }}
-              >
+              ) : (
                 <LikeGreen style={styles.footerImage} />
-              </TouchableOpacity>
-            )}
+              )}
+            </TouchableOpacity>
           </View>
-
-          {!detail.me_going && (
-            <TouchableOpacity
-              style={styles.joinFooter}
-              onPress={() => {
-                props.chooseLikeGoing(0, 'participants', detail.id, true);
-              }}
-            >
-              <CheckOutlineLogo style={styles.joinImage} />
-              <Text style={styles.joinText}>Join</Text>
-            </TouchableOpacity>
-          )}
-          {detail.me_going && (
-            <TouchableOpacity
-              style={styles.joinFooter}
-              onPress={() => {
-                props.chooseLikeGoing(0, 'participants', detail.id, false);
-              }}
-            >
-              <CheckBig style={styles.joinImage} />
-              <Text style={styles.joinText}>I am going</Text>
-            </TouchableOpacity>
-          )}
+          {/* going按钮 */}
+          <TouchableOpacity
+            style={styles.joinFooter}
+            onPress={() => {
+              chooseLikeGoing(0, 'participants', detail.id, !detail.me_going);
+            }}
+          >
+            {!detail.me_going ? (
+              <View style={styles.joinFooterView}>
+                <CheckOutlineLogo style={styles.joinImage} />
+                <Text style={styles.joinText}>Join</Text>
+              </View>
+            ) : (
+              <View style={styles.joinFooterView}>
+                <CheckBig style={styles.joinImage} />
+                <Text style={styles.joinText}>I am going</Text>
+              </View>
+            )}
+          </TouchableOpacity>
         </View>
       )}
     </View>
   );
 }
-/*eslint i18next/no-literal-string: ["error", { "ignoreCallee": ["StyleSheet.create"] }]*/
+
 const styles = StyleSheet.create({
   footer: {
     height: 56,
-    backgroundColor: '#8560A9',
+    backgroundColor: BACKGROUND_PURPLE,
     flexDirection: 'row',
   },
   joinImage: {
@@ -142,9 +141,13 @@ const styles = StyleSheet.create({
     height: 24,
     marginTop: 16,
   },
+  joinFooterView: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+  },
   joinFooter: {
     width: '45%',
-    backgroundColor: '#D5EF7F',
+    backgroundColor: GREEN,
     height: 56,
     flexDirection: 'row',
     justifyContent: 'center',
@@ -173,7 +176,7 @@ const styles = StyleSheet.create({
     marginLeft: 15,
   },
   inputStyle: {
-    backgroundColor: '#fff',
+    backgroundColor: BACK_WHITE,
     height: 32,
     borderRadius: 20,
     flex: 1,
@@ -184,7 +187,7 @@ const styles = StyleSheet.create({
   },
   sendButton: {
     width: 64,
-    backgroundColor: '#D5EF7F',
+    backgroundColor: GREEN,
     justifyContent: 'center',
     alignItems: 'center',
   },

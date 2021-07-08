@@ -3,18 +3,24 @@
  */
 
 import React, {useState, useEffect, useRef} from 'react';
+import {StackScreenProps} from '@react-navigation/stack';
 import {FlatList, View, StyleSheet, Animated} from 'react-native';
 import {Observer, useLocalObservable} from 'mobx-react';
 import Header from '../../components/Header';
 import ListItem from '../../components/ListItem';
 import LeftNav from './components/LeftNav';
-import {get, post, del} from '../../utils/request';
 import {stores} from '../../store';
-import {selectTimeAction} from '../../globalConfig';
-import {transTimeToString} from '../../utils/public';
+import {selectTime} from '../../globalConfig';
+import {transTimeToString} from '../../utils/formatTime';
 import EmptyPage from '../../components/EmptyPage';
 import SearchResult from './components/SearchResult';
-import {channelType} from '../../types/types';
+import {RootStackParamList, channelType, eventsType} from '../../types/types';
+import {
+  getEventsApi,
+  getChannelsApi,
+  chooseLikeGoingApi,
+} from '../../utils/api';
+import {BACK_WHITE} from '../../styles';
 
 interface eventParams {
   after?: number;
@@ -22,7 +28,7 @@ interface eventParams {
   channels?: number;
 }
 
-function List({navigation}: {navigation: any}) {
+function List({navigation}: StackScreenProps<RootStackParamList, 'List'>) {
   const store = useLocalObservable(() => stores);
   // 左滑距离（导航栏宽度）
   const leftDistance = useRef(new Animated.Value(0)).current;
@@ -55,17 +61,20 @@ function List({navigation}: {navigation: any}) {
 
   // 获取列表数据
   const getEventsList = async (params: eventParams = {}) => {
-    const res = await get('/events', params);
-    setSearchCount(res.total);
-    store.setEvents(res.events);
+    const res = await getEventsApi(params);
+    if (res) {
+      setSearchCount(res.total);
+      store.setEvents(res.events);
+    }
   };
 
   // 获取channel列表
   const getChannels = async () => {
-    const res = await get('/channels');
-    res.channels.unshift({id: 0, name: 'All'});
-    store.setChannelData(res.channels);
-    return res;
+    const res = await getChannelsApi();
+    if (res) {
+      res.channels.unshift({id: 0, name: 'All'});
+      store.setChannelData(res.channels);
+    }
   };
 
   // 获取参数改变后刷新列表
@@ -83,8 +92,7 @@ function List({navigation}: {navigation: any}) {
   const refreshList = async () => {
     const eventList = store.events;
     const eventLen = eventList.length;
-    const res = await get(
-      '/events',
+    const res = await getEventsApi(
       Object.assign(eventParams, {
         offset: eventLen,
       })
@@ -96,12 +104,12 @@ function List({navigation}: {navigation: any}) {
   const getTimeRange = () => {
     let timeRange;
     if (store.selectTime === 5) {
-      timeRange = selectTimeAction[store.selectTime].fn(
+      timeRange = selectTime[store.selectTime].fn(
         store.startTime,
         store.endTime
       );
     } else {
-      timeRange = selectTimeAction[store.selectTime].fn();
+      timeRange = selectTime[store.selectTime].fn();
     }
     return timeRange;
   };
@@ -118,15 +126,16 @@ function List({navigation}: {navigation: any}) {
   // 选择channel
   const setSelectChannel = (value: channelType) => {
     store.setSelectChannel(value);
-    const searchText = value.name + ' activites ' + getTimeRangeText();
+    const searchText = `${value.name} activites ${getTimeRangeText()}`;
     setSearchText(searchText);
   };
 
   // 选择时间段
   const setSelectTime = (value: number) => {
     store.setSelectTime(value);
-    const searchText =
-      store.selectChannel.name + ' activites ' + getTimeRangeText();
+    const searchText = `${
+      store.selectChannel.name
+    } activites ${getTimeRangeText()}`;
     setSearchText(searchText);
   };
   // 点击搜索按钮
@@ -150,8 +159,6 @@ function List({navigation}: {navigation: any}) {
     store.setSelectChannel({
       id: -1,
       name: '',
-      email: '',
-      username: '',
     });
     store.setSelectTime(-1);
     setEventParams({});
@@ -161,25 +168,21 @@ function List({navigation}: {navigation: any}) {
   const chooseLikeGoing = async (
     index: number,
     type: string,
-    event_id: number,
-    addlikes: boolean
+    eventId: number,
+    status: boolean
   ) => {
     const eventList = [...store.events];
     const typename = type === 'likes' ? 'me_likes' : 'me_going';
-    if (addlikes) {
-      await post(`/events/${event_id}/${type}`);
-    } else {
-      del(`/events/${event_id}/${type}`);
-    }
-    eventList[index][typename] = addlikes;
+    await chooseLikeGoingApi(eventId, type, status);
+    eventList[index][typename] = status;
     store.setEvents(eventList);
   };
 
   // 列表项
-  const renderItem = ({item, index}) => {
+  const renderItem = ({item, index}: {item: eventsType; index: number}) => {
     return (
       <ListItem
-        item={item}
+        {...item}
         index={index}
         key={index}
         chooseLikeGoing={chooseLikeGoing}
@@ -236,12 +239,14 @@ function List({navigation}: {navigation: any}) {
             <FlatList
               data={store.events}
               renderItem={renderItem}
-              keyExtractor={(item, index) => index.toString()}
+              keyExtractor={(item, index) => item.id.toString()}
               onEndReachedThreshold={0.2}
               onEndReached={() => {
                 refreshList();
               }}
               ListEmptyComponent={EmptyPage}
+              windowSize={8}
+              initialNumToRender={5}
             />
           </Animated.View>
         </View>
@@ -253,12 +258,12 @@ function List({navigation}: {navigation: any}) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: BACK_WHITE,
   },
   rightContainer: {
     zIndex: 2,
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: BACK_WHITE,
   },
 });
 

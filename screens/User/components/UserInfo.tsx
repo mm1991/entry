@@ -6,13 +6,11 @@ import React from 'react';
 import {Text, View, Image, StyleSheet} from 'react-native';
 import Email from '../../../assets/images/email.svg';
 import {userInfoType} from '../../../types/types';
+import {TEXT_PURPLE, TEXT_NORMAL} from '../../../styles';
+import {resetGlobalState} from 'mobx/dist/internal';
 
-interface userInfoProps {
-  userData: userInfoType;
-}
-
-export default function UserInfo(props: userInfoProps) {
-  const {avatar, email, username} = props.userData;
+export default function UserInfo({userData}: {userData: userInfoType}) {
+  const {avatar, email, username} = userData;
   return (
     <View style={styles.UserWrapper}>
       <Image
@@ -44,10 +42,10 @@ const styles = StyleSheet.create({
     marginBottom: 24,
     borderRadius: 72,
     borderWidth: 3,
-    borderColor: '#8560A9',
+    borderColor: 'rgba(208, 194, 229, 1)',
   },
   name: {
-    color: '#67616D',
+    color: TEXT_NORMAL,
     fontSize: 24,
     lineHeight: 31,
     paddingBottom: 8,
@@ -62,7 +60,7 @@ const styles = StyleSheet.create({
     marginRight: 6,
   },
   emailText: {
-    color: '#8560A9',
+    color: TEXT_PURPLE,
     fontSize: 14,
     paddingBottom: 24,
   },

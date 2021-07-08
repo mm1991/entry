@@ -29,7 +29,7 @@ export interface userInfoType {
   goings_count: number;
 }
 
-interface creator {
+export interface creator {
   avatar: string;
   username: string;
 }
@@ -59,6 +59,16 @@ export interface channelType {
 export interface eventsType {
   me_likes: boolean;
   me_going: boolean;
+  images: Array<string>;
+  creator: creator;
+  channel: channelType;
+  id: number;
+  name: string;
+  begin_time: string;
+  update_time: string;
+  description: string;
+  goings_count: number;
+  likes_count: number;
 }
 
 export interface commentType {

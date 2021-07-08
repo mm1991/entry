@@ -7,8 +7,9 @@ import {TouchableOpacity, Text, StyleSheet} from 'react-native';
 import {stores} from '../store';
 import {Observer, useLocalObservable} from 'mobx-react';
 import {i18nT} from '../i18n';
+import {GREEN} from '../styles';
 
-export default function SwitchLang() {
+const SwitchLang = React.memo(() => {
   const store = useLocalObservable(() => stores);
 
   // 通过改变store中lang参数切换语言
@@ -24,7 +25,7 @@ export default function SwitchLang() {
       )}
     </Observer>
   );
-}
+});
 
 const styles = StyleSheet.create({
   switchBtn: {
@@ -33,11 +34,11 @@ const styles = StyleSheet.create({
     right: 20,
     borderRadius: 25,
     zIndex: 3,
-    borderColor: '#D5EF7F',
+    borderColor: GREEN,
     borderWidth: 1,
   },
   switchText: {
-    color: '#D5EF7F',
+    color: GREEN,
     textAlign: 'center',
     lineHeight: 23,
     fontSize: 12,
@@ -45,3 +46,5 @@ const styles = StyleSheet.create({
     paddingRight: 10,
   },
 });
+
+export default SwitchLang;

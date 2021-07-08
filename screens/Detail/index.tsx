@@ -1,10 +1,9 @@
 /**
  * 详情部分
  */
-
+// fffff
 import React, {useState, useEffect, useRef} from 'react';
 import {StyleSheet, View, ScrollView} from 'react-native';
-import {get, post, del} from '../../utils/request';
 import Header from '../../components/Header';
 import DetailTop from './components/DetailTop';
 import DetailTab from './components/DetailTab';
@@ -17,6 +16,15 @@ import Toast from '../../components/Toast';
 import {detail} from '../../types/types';
 import {stores} from '../../store';
 import {defualtAvatar} from '../../globalConfig';
+import {
+  getEventDetailApi,
+  getCommentsApi,
+  submitCommentsApi,
+  getParticipantsApi,
+  getLikesApi,
+  chooseLikeGoingApi,
+} from '../../utils/api';
+import {BACK_WHITE} from '../../styles';
 
 export default function Detail({
   route,
@@ -54,33 +62,33 @@ export default function Detail({
   const [comments, setComments] = useState([]);
   const [eventType, setEventType] = useState('details');
   const [topHide, setTopHide] = useState(false);
-  const [participantsLayoutY, setParticipantsLayoutY] = useState(0);
-  const [topHeight, setTopHeight] = useState(0);
-  const [commentsLayoutY, setCommentsLayoutY] = useState(0);
-  const scrollViewRef = useRef(null);
+  const commentsLayoutY = useRef(0);
+  const topHeight = useRef(0);
+  const participantsLayoutY = useRef(0);
 
+  const scrollViewRef = useRef(null);
   // 获取活动详情
   const getDetail = async () => {
-    const res = await get(`/events/${route.params.id}`);
-    setDetail(res.event);
+    const res = await getEventDetailApi(route.params.id);
+    res && setDetail(res.event);
   };
 
   // 获取going详情
   const getParticipants = async () => {
-    const res = await get(`/events/${route.params.id}/participants`);
-    setParticipants(res.users);
+    const res = await getParticipantsApi(route.params.id);
+    res && setParticipants(res.users);
   };
 
   // 获取likes详情
   const getLikes = async () => {
-    const res = await get(`/events/${route.params.id}/likes`);
-    setLikes(res.users);
+    const res = await getLikesApi(route.params.id);
+    res && setLikes(res.users);
   };
 
   // 获取评论详情
   const getComments = async () => {
-    const res = await get(`/events/${route.params.id}/comments`);
-    setComments(res.comments);
+    const res = await getCommentsApi(route.params.id);
+    res && setComments(res.comments);
   };
 
   // 初始化获取信息
@@ -93,47 +101,42 @@ export default function Detail({
 
   // 发表评论
   const submitComments = async (comment: string) => {
-    const res = await post(`/events/${route.params.id}/comments`, {
-      comment,
-    });
-
-    setComments(comments.concat(res));
-    childRef.current.showToast('message');
-    setTopHide(true);
-    // 滚动到详情部分
-    scrollViewRef.current.scrollToEnd({duration: 200});
+    const res = await submitCommentsApi(route.params.id, comment);
+    if (res) {
+      setComments(comments.concat(res));
+      childRef.current.showToast('success');
+      setTopHide(true);
+      // 滚动到详情部分
+      scrollViewRef.current.scrollToEnd({duration: 200});
+    }
   };
 
   // 选择like&going
   const chooseLikeGoing = async (
     index: number,
     type: string,
-    event_id: number,
-    addlikes: boolean
+    eventId: number,
+    status: boolean
   ) => {
     const eventList = [...store.events];
     const detailData = {...detail};
     const typename = type === 'likes' ? 'me_likes' : 'me_going';
-    if (addlikes) {
-      await post(`/events/${event_id}/${type}`);
-    } else {
-      await del(`/events/${event_id}/${type}`);
-    }
-    detailData[typename] = addlikes;
-    eventList[route.params.index][typename] = addlikes;
+    await chooseLikeGoingApi(eventId, type, status);
+    detailData[typename] = status;
+    eventList[route.params.index][typename] = status;
     setDetail(detailData);
     store.setEvents(eventList);
   };
 
   // 根据滑动高度计算活跃tab
-  const scrollCal = e => {
+  const scrollCal = (e: any) => {
     const offsetY = e.nativeEvent.contentOffset.y;
-    setTopHide(offsetY > topHeight);
-    if (offsetY < participantsLayoutY - 50) {
+    setTopHide(offsetY > topHeight.current);
+    if (offsetY < participantsLayoutY.current - 50) {
       setEventType('details');
     } else if (
-      offsetY > participantsLayoutY - 50 &&
-      offsetY < commentsLayoutY - 50
+      offsetY > participantsLayoutY.current - 50 &&
+      offsetY < commentsLayoutY.current - 50
     ) {
       setEventType('participants');
     } else {
@@ -149,13 +152,13 @@ export default function Detail({
       } else if (type === 'participants') {
         setTimeout(() => {
           scrollViewRef.current.scrollTo({
-            y: participantsLayoutY - 50,
+            y: participantsLayoutY.current - 50,
             duration: 200,
           });
         }, 0);
       } else {
         scrollViewRef.current.scrollTo({
-          y: commentsLayoutY,
+          y: commentsLayoutY.current,
           duration: 200,
         });
       }
@@ -181,10 +184,10 @@ export default function Detail({
           >
             <View
               onLayout={e => {
-                setTopHeight(e.nativeEvent.layout.height);
+                topHeight.current = e.nativeEvent.layout.height;
               }}
             >
-              <DetailTop detail={detail} show={'true'} />
+              <DetailTop detail={detail} show={true} />
             </View>
             <DetailTab
               eventType={eventType}
@@ -194,7 +197,7 @@ export default function Detail({
             <DetailActivity detail={detail} />
             <View
               onLayout={e => {
-                setParticipantsLayoutY(e.nativeEvent.layout.y);
+                participantsLayoutY.current = e.nativeEvent.layout.y;
               }}
             >
               <DetailParticipants
@@ -205,7 +208,7 @@ export default function Detail({
             </View>
             <View
               onLayout={e => {
-                setCommentsLayoutY(e.nativeEvent.layout.y);
+                commentsLayoutY.current = e.nativeEvent.layout.y;
               }}
             >
               <DetailComments comments={comments} />
@@ -225,6 +228,6 @@ export default function Detail({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: BACK_WHITE,
   },
 });

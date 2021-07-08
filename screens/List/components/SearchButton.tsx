@@ -6,32 +6,27 @@ import React from 'react';
 import {Text, View, TouchableOpacity, StyleSheet} from 'react-native';
 import {Dimensions} from 'react-native';
 import SearchLogo from '../../../assets/images/search.svg';
+import {GREEN, PURPLE, TEXT_PURPLE} from '../../../styles';
 
-interface SearchButtonProps {
+export default function SearchButton({
+  searchActive,
+  submitSearch,
+  searchText,
+}: {
   searchActive: boolean;
   submitSearch: Function;
   searchText: string;
-}
-
-export default function SearchButton(props: SearchButtonProps) {
-  const submitSearch = () => {
-    if (props.searchActive) {
-      props.submitSearch();
+}) {
+  const submitSearchActive = () => {
+    if (searchActive) {
+      submitSearch();
     }
   };
 
   return (
     <TouchableOpacity
-      onPress={() => submitSearch()}
-      style={[
-        styles.buttonWrapper,
-        {
-          top: Dimensions.get('window').height - 145,
-        },
-        props.searchActive && {
-          backgroundColor: '#D5EF7F',
-        },
-      ]}
+      onPress={() => submitSearchActive()}
+      style={[styles.buttonWrapper, searchActive && styles.searchActive]}
     >
       <View style={styles.button}>
         <View style={styles.searchWrapper}>
@@ -39,17 +34,13 @@ export default function SearchButton(props: SearchButtonProps) {
           <Text
             style={[
               styles.searchStyle,
-              props.searchActive && {
-                color: '#453257',
-              },
+              searchActive && styles.searchTextActive,
             ]}
           >
             SEARCH
           </Text>
         </View>
-        {props.searchActive && (
-          <Text style={styles.subtip}>{props.searchText}</Text>
-        )}
+        {searchActive && <Text style={styles.subtip}>{searchText}</Text>}
       </View>
     </TouchableOpacity>
   );
@@ -62,6 +53,7 @@ const styles = StyleSheet.create({
     width: 240,
     position: 'absolute',
     justifyContent: 'center',
+    top: Dimensions.get('window').height - 145,
   },
   button: {
     alignItems: 'center',
@@ -82,7 +74,13 @@ const styles = StyleSheet.create({
   },
   subtip: {
     fontSize: 10,
-    color: '#8560A9',
+    color: TEXT_PURPLE,
     paddingTop: 3,
+  },
+  searchActive: {
+    backgroundColor: GREEN,
+  },
+  searchTextActive: {
+    color: PURPLE,
   },
 });

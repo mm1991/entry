@@ -1,3 +1,7 @@
+/**
+ * 本地存储方法
+ */
+
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const getStorage = (name: string) => {
@@ -22,4 +26,8 @@ export const setStorage = (name: string, data: string | Object) => {
       resolve(e);
     });
   });
+};
+
+export const removeStorage = (name: string) => {
+  AsyncStorage.removeItem(name);
 };

@@ -14,17 +14,22 @@ import {
 import Gmap from '../../../assets/images/gmap.png';
 import DateFrom from '../../../assets/images/date-from.svg';
 import DateTo from '../../../assets/images/date-to.svg';
-import {formatDate, formatTime} from '../../../utils/public';
+import {formatDate, formatTime} from '../../../utils/formatTime';
 import {detail} from '../../../types/types';
+import {
+  GREEN,
+  BORDER_COLOR,
+  TEXT_PURPLE,
+  BACKGROUND_PURPLE,
+  TEXT_NORMAL,
+  GREEN_TEXT,
+  BACK_WHITE,
+} from '../../../styles';
 
-interface DetailActivityProps {
-  detail: detail;
-}
-
-export default function DetailActivity(props: DetailActivityProps) {
-  const {detail} = props;
+export default function DetailActivity({detail}: {detail: detail}) {
   const [textOver, setTextOver] = useState(false);
   const [init, setInit] = useState(true);
+  // 图片列表
   const imageList =
     detail.images &&
     detail.images.map((url, index) => {
@@ -38,8 +43,38 @@ export default function DetailActivity(props: DetailActivityProps) {
         ></Image>
       );
     });
+  // 子标题
+  const subTitle = (text: string) => {
+    return (
+      <View style={styles.subTitle}>
+        <View style={styles.subTitleIcon}></View>
+        <Text style={styles.subTitleText}>{text}</Text>
+      </View>
+    );
+  };
+
+  // 时间显示
+  const timeContent = (time: string, from: boolean) => {
+    return (
+      <View style={[styles.dateContent, styles.dateBorder]}>
+        <View style={styles.dateWrapper}>
+          {from ? (
+            <DateFrom style={styles.dateImage} />
+          ) : (
+            <DateTo style={styles.dateImage} />
+          )}
+          <Text style={styles.dateText}>{time && formatDate(time)}</Text>
+        </View>
+        <View style={styles.timeWrapper}>
+          <Text style={styles.timeText}>{time && formatTime(time).time}</Text>
+          <Text style={styles.amText}>{time && formatTime(time).ampm}</Text>
+        </View>
+      </View>
+    );
+  };
   return (
     <View>
+      {/* 文章详情 */}
       <View>
         {detail.images && detail.images.length > 0 && (
           <ScrollView horizontal={true} style={styles.imageScroll}>
@@ -74,51 +109,17 @@ export default function DetailActivity(props: DetailActivityProps) {
           )}
         </View>
       </View>
+      {/* 显示地点 */}
       <View style={styles.whenWrapper}>
-        <View style={styles.subTitle}>
-          <View style={styles.subTitleIcon}></View>
-          <Text style={styles.subTitleText}>When</Text>
-        </View>
+        {subTitle('When')}
         <View style={styles.whenDetailWrapper}>
-          <View style={[styles.dateContent, styles.dateBorder]}>
-            <View style={styles.dateWrapper}>
-              <DateFrom style={styles.dateImage} />
-              <Text style={styles.dateText}>
-                {detail.createdAt && formatDate(detail.createdAt)}
-              </Text>
-            </View>
-            <View style={styles.timeWrapper}>
-              <Text style={styles.timeText}>
-                {detail.createdAt && formatTime(detail.createdAt).time}
-              </Text>
-              <Text style={styles.amText}>
-                {detail.createdAt && formatTime(detail.createdAt).ampm}
-              </Text>
-            </View>
-          </View>
-          <View style={styles.dateContent}>
-            <View style={styles.dateWrapper}>
-              <DateTo style={styles.dateImage} />
-              <Text style={styles.dateText}>
-                {detail.updatedAt && formatDate(detail.updatedAt)}
-              </Text>
-            </View>
-            <View style={styles.timeWrapper}>
-              <Text style={styles.timeText}>
-                {detail.updatedAt && formatTime(detail.updatedAt).time}
-              </Text>
-              <Text style={styles.amText}>
-                {detail.createdAt && formatTime(detail.updatedAt).ampm}
-              </Text>
-            </View>
-          </View>
+          {timeContent(detail.createdAt, true)}
+          {timeContent(detail.updatedAt, false)}
         </View>
       </View>
+      {/* 显示地点 */}
       <View style={styles.whereWrapper}>
-        <View style={styles.subTitle}>
-          <View style={styles.subTitleIcon}></View>
-          <Text style={styles.subTitleText}>Where</Text>
-        </View>
+        {subTitle('Where')}
         <Text style={styles.addText1}>{detail.location}</Text>
         <Text style={styles.addText}>{detail.location_detail}</Text>
         <Image source={Gmap} style={styles.mapImage} />
@@ -145,13 +146,13 @@ const styles = StyleSheet.create({
     paddingBottom: 23,
     marginTop: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#E8E8E8',
+    borderBottomColor: BORDER_COLOR,
   },
   articleText: {
-    color: '#67616D',
+    color: TEXT_NORMAL,
   },
   articleShadow: {
-    backgroundColor: '#fff',
+    backgroundColor: BACK_WHITE,
     opacity: 0.7,
     position: 'absolute',
     bottom: 0,
@@ -162,11 +163,11 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 0,
     right: 16,
-    backgroundColor: '#D5EF7F',
+    backgroundColor: GREEN,
     borderRadius: 12,
   },
   viewAllText: {
-    color: '#67616D',
+    color: TEXT_NORMAL,
     fontWeight: 'bold',
     fontSize: 10,
     paddingLeft: 13,
@@ -176,14 +177,14 @@ const styles = StyleSheet.create({
   whenWrapper: {
     marginLeft: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#E8E8E8',
+    borderBottomColor: BORDER_COLOR,
   },
   whereWrapper: {
     paddingLeft: 16,
     paddingRight: 16,
     paddingBottom: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#E8E8E8',
+    borderBottomColor: BORDER_COLOR,
   },
   subTitle: {
     flexDirection: 'row',
@@ -193,11 +194,11 @@ const styles = StyleSheet.create({
   subTitleIcon: {
     width: 4,
     height: 18,
-    backgroundColor: '#8560A9',
+    backgroundColor: BACKGROUND_PURPLE,
     borderRadius: 3,
   },
   subTitleText: {
-    color: '#8560A9',
+    color: TEXT_PURPLE,
     fontSize: 16,
     fontWeight: 'bold',
     paddingLeft: 4,
@@ -225,32 +226,32 @@ const styles = StyleSheet.create({
     paddingTop: 6,
   },
   dateText: {
-    color: '#67616D',
+    color: TEXT_NORMAL,
     fontSize: 16,
     paddingLeft: 4,
   },
   timeText: {
-    color: '#AECB4F',
+    color: GREEN_TEXT,
     fontSize: 32,
   },
   amText: {
-    color: '#AECB4F',
+    color: GREEN_TEXT,
     fontSize: 10,
     paddingBottom: 5,
     paddingLeft: 5,
   },
   dateBorder: {
     borderRightWidth: 1,
-    borderRightColor: '#E8E8E8',
+    borderRightColor: BORDER_COLOR,
   },
   addText1: {
-    color: '#67616D',
+    color: TEXT_NORMAL,
     fontSize: 14,
     fontWeight: 'bold',
     lineHeight: 20,
   },
   addText: {
-    color: '#67616D',
+    color: TEXT_NORMAL,
     fontSize: 14,
   },
   mapImage: {

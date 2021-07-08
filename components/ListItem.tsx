@@ -9,129 +9,165 @@ import CheckOutlineLogo from '../assets/images/check-outline.svg';
 import CheckLogo from '../assets/images/check.svg';
 import LikeOutlineLogo from '../assets/images/like-outline.svg';
 import LikeLogo from '../assets/images/like.svg';
-import {formatDate, limitChar} from '../utils/public';
+import {formatDate, limitChar} from '../utils/formatTime';
+import {creator, channelType} from '../types/types';
+import {
+  PURPLE,
+  BORDER_COLOR,
+  TEXT_PURPLE,
+  TEXT_NORMAL,
+  TEXT_NORMAL_LIGHT,
+  tagWrapper,
+  tagText,
+  titleText,
+} from '../styles';
 
-export default function ListItem(props) {
-  const {item, index, navigation} = props;
-  const ImageUrl = item.images && item.images.length > 0 ? item.images[0] : '';
+const ListItem = React.memo(
+  ({
+    images,
+    creator,
+    channel,
+    id,
+    name,
+    begin_time,
+    update_time,
+    description,
+    me_going,
+    goings_count,
+    likes_count,
+    me_likes,
+    index,
+    navigation,
+    chooseLikeGoing,
+  }: {
+    me_likes: boolean;
+    me_going: boolean;
+    images: Array<string>;
+    creator: creator;
+    channel: channelType;
+    id: number;
+    name: string;
+    begin_time: string;
+    update_time: string;
+    description: string;
+    goings_count: number;
+    likes_count: number;
+    index: number;
+    navigation: any;
+    chooseLikeGoing?: Function;
+  }) => {
+    const ImageUrl = images && images.length > 0 ? images[0] : '';
 
-  return (
-    <View style={styles.ItemContainer}>
-      <View style={styles.ItemTop}>
-        <View style={styles.ItemTopUser}>
-          <Image
-            style={styles.ItemTopAvatar}
-            source={{
-              uri: item.creator.avatar,
-            }}
-          ></Image>
-          <View style={styles.ItemTopUserName}>
-            <Text style={styles.ItemTopUserText}>{item.creator.username}</Text>
-          </View>
-        </View>
-        <View style={styles.ItemTopTag}>
-          <Text style={styles.ItemTopTagText}>{item.channel.name}</Text>
-        </View>
-      </View>
-      <View style={styles.ItemTitleContainer}>
-        <View style={styles.ItemTitleTextView}>
-          <TouchableOpacity
-            onPress={() => {
-              navigation.navigate('Detail', {id: item.id, index: index});
-            }}
-          >
-            <Text style={styles.ItemTitleText}>{item.name}</Text>
-          </TouchableOpacity>
-          <View style={styles.timeWraper}>
-            <TimeLogo style={styles.timeImage} />
-            <Text style={styles.ItemTimeText}>
-              {formatDate(item.begin_time)} - {formatDate(item.update_time)}
-            </Text>
-          </View>
-          <Text style={styles.ItemAbstractText}>
-            {limitChar(item.description, 200)}
-          </Text>
-        </View>
-        {!!ImageUrl && (
-          <Image
-            source={{
-              uri: ImageUrl,
-            }}
-            style={{width: 64, height: 64}}
-          ></Image>
-        )}
-      </View>
-      <View style={styles.ItemChoose}>
-        <TouchableOpacity
-          onPress={() =>
-            props.chooseLikeGoing &&
-            props.chooseLikeGoing(
-              index,
-              'participants',
-              item.id,
-              !item.me_going
-            )
-          }
-        >
-          {item.me_going && (
-            <View style={styles.timeWraper}>
-              <CheckLogo style={styles.bottomImage} />
-              <Text style={styles.ItemChooseGoingText}>I am going!</Text>
+    return (
+      <View style={styles.ItemContainer}>
+        {/* 顶部-头像、用户名、标签 */}
+        <View style={styles.ItemTop}>
+          <View style={styles.ItemTopUser}>
+            <Image
+              style={styles.ItemTopAvatar}
+              source={{
+                uri: creator.avatar,
+              }}
+            ></Image>
+            <View style={styles.ItemTopUserName}>
+              <Text style={styles.ItemTopUserText}>{creator.username}</Text>
             </View>
-          )}
-          {!item.me_going && (
+          </View>
+          <View style={styles.tagWrapper}>
+            <Text style={styles.tagText}>{channel.name}</Text>
+          </View>
+        </View>
+        {/* 文章标题、发布时间、内容、图片 */}
+        <View style={styles.ItemTitleContainer}>
+          <View style={styles.ItemTitleTextView}>
+            <TouchableOpacity
+              onPress={() => {
+                navigation.navigate('Detail', {id: id, index: index});
+              }}
+            >
+              <Text style={styles.titleText}>{name}</Text>
+            </TouchableOpacity>
             <View style={styles.timeWraper}>
-              <CheckOutlineLogo style={styles.bottomImage} />
-              <Text style={styles.ItemGoingText}>
-                {item.goings_count} Going
+              <TimeLogo style={styles.timeImage} />
+              <Text style={styles.ItemTimeText}>
+                {formatDate(begin_time)} - {formatDate(update_time)}
               </Text>
             </View>
+            <Text style={styles.ItemAbstractText}>
+              {limitChar(description, 200)}
+            </Text>
+          </View>
+          {!!ImageUrl && (
+            <Image
+              source={{
+                uri: ImageUrl,
+              }}
+              style={{width: 64, height: 64}}
+            ></Image>
           )}
-        </TouchableOpacity>
+        </View>
+        {/* 底部选择like、going */}
+        <View style={styles.ItemChoose}>
+          <TouchableOpacity
+            onPress={() =>
+              chooseLikeGoing &&
+              chooseLikeGoing(index, 'participants', id, !me_going)
+            }
+          >
+            {me_going ? (
+              <View style={styles.timeWraper}>
+                <CheckLogo style={styles.bottomImage} />
+                <Text style={styles.ItemChooseGoingText}>I am going!</Text>
+              </View>
+            ) : (
+              <View style={styles.timeWraper}>
+                <CheckOutlineLogo style={styles.bottomImage} />
+                <Text style={styles.ItemGoingText}>{goings_count} Going</Text>
+              </View>
+            )}
+          </TouchableOpacity>
 
-        <TouchableOpacity
-          onPress={() =>
-            props.chooseLikeGoing &&
-            props.chooseLikeGoing(index, 'likes', item.id, !item.me_likes)
-          }
-        >
-          {item.me_likes && (
-            <View style={[styles.ItemChooseLikes, styles.timeWraper]}>
-              <LikeLogo style={styles.bottomImage} />
-              <Text style={styles.ItemChooseGoingText}>I Like it</Text>
-            </View>
-          )}
-          {!item.me_likes && (
-            <View style={[styles.ItemChooseLikes, styles.timeWraper]}>
-              <LikeOutlineLogo style={styles.bottomImage} />
-              <Text style={styles.ItemGoingText}>{item.likes_count} Likes</Text>
-            </View>
-          )}
-        </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() =>
+              chooseLikeGoing && chooseLikeGoing(index, 'likes', id, !me_likes)
+            }
+          >
+            {me_likes ? (
+              <View style={[styles.ItemChooseLikes, styles.timeWraper]}>
+                <LikeLogo style={styles.bottomImage} />
+                <Text style={styles.ItemChooseGoingText}>I Like it</Text>
+              </View>
+            ) : (
+              <View style={[styles.ItemChooseLikes, styles.timeWraper]}>
+                <LikeOutlineLogo style={styles.bottomImage} />
+                <Text style={styles.ItemGoingText}>{likes_count} Likes</Text>
+              </View>
+            )}
+          </TouchableOpacity>
+        </View>
       </View>
-    </View>
-  );
-}
+    );
+  }
+);
 
 const styles = StyleSheet.create({
+  tagWrapper,
+  tagText,
+  titleText,
   ItemContainer: {
     paddingTop: 16,
     paddingLeft: 16,
-    color: '#67616D',
     backgroundColor: '#fafafa',
   },
   ItemTop: {
-    display: 'flex',
     flexDirection: 'row',
     paddingRight: 16,
   },
   timeWraper: {
-    display: 'flex',
     flexDirection: 'row',
   },
   ItemTopUser: {
     flex: 1,
-    display: 'flex',
     flexDirection: 'row',
     fontWeight: '600',
   },
@@ -141,26 +177,13 @@ const styles = StyleSheet.create({
   ItemTopUserText: {
     fontSize: 12,
     lineHeight: 20,
-    color: '#67616D',
+    color: TEXT_NORMAL,
     fontWeight: 'bold',
   },
   ItemTopAvatar: {
     width: 20,
     height: 20,
     borderRadius: 20,
-  },
-  ItemTopTag: {
-    borderWidth: 1,
-    borderColor: '#D3C1E5',
-    borderRadius: 20,
-    paddingLeft: 10,
-    paddingRight: 10,
-    height: 20,
-  },
-  ItemTopTagText: {
-    lineHeight: 18,
-    color: '#8560A9',
-    fontSize: 12,
   },
   ItemTitleContainer: {
     paddingTop: 8,
@@ -172,37 +195,31 @@ const styles = StyleSheet.create({
   ItemTitleTextView: {
     flex: 1,
   },
-  ItemTitleText: {
-    color: '#453257',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
   ItemTimeText: {
-    color: '#8560A9',
+    color: TEXT_PURPLE,
     fontSize: 12,
     paddingTop: 8,
   },
   ItemAbstractText: {
-    color: '#67616D',
+    color: TEXT_NORMAL,
     paddingTop: 12,
     fontSize: 14,
   },
   ItemChoose: {
-    color: '#AC8EC9',
     fontSize: 12,
     display: 'flex',
     flexDirection: 'row',
     paddingBottom: 18,
     borderBottomWidth: 1,
-    borderColor: '#e8e8e8',
+    borderColor: BORDER_COLOR,
   },
   ItemGoingText: {
     fontSize: 12,
-    color: '#AC8EC9',
+    color: TEXT_NORMAL_LIGHT,
   },
   ItemChooseGoingText: {
     fontSize: 12,
-    color: '#453257',
+    color: PURPLE,
   },
   ItemChooseLikes: {
     paddingLeft: 20,
@@ -220,3 +237,5 @@ const styles = StyleSheet.create({
     marginRight: 5,
   },
 });
+
+export default ListItem;

@@ -17,6 +17,7 @@ import CommentOutline from '../assets/images/comment-outline.svg';
 import InfoActive from '../assets/images/info-active.svg';
 import PeopleActive from '../assets/images/people-active.svg';
 import CommentActive from '../assets/images/comment-active.svg';
+import {BORDER_COLOR, GREEN_TEXT, BACK_WHITE} from '../styles';
 
 const typeIconMap = {
   liked: LikeGreen,
@@ -33,40 +34,56 @@ const typeIconMap = {
   uncomments: CommentOutline,
 };
 
-interface UserTabProps {
-  text: string;
-  currenType: string;
-  eventType: string;
-  setEventType: Function;
-}
-export default function TabItem(props: UserTabProps) {
-  const SelectIcon = typeIconMap[props.currenType];
-  const UnSelectIcon = typeIconMap['un' + props.currenType];
-  return (
-    <TouchableOpacity
-      onPress={() => {
-        props.setEventType(props.currenType);
-      }}
-    >
-      <View style={[styles.tabDetail, styles.tabBorder]}>
-        {props.eventType === props.currenType && (
-          <SelectIcon style={styles.tabImg} />
-        )}
-        {props.eventType !== props.currenType && (
-          <UnSelectIcon style={styles.tabImg} />
-        )}
-        <Text
-          style={[
-            styles.tabText,
-            props.eventType === props.currenType && {color: '#AECB4F'},
-          ]}
-        >
-          {props.text}
-        </Text>
+const Tabbar = React.memo(
+  ({
+    tabArr,
+    eventType,
+    setEventType,
+    show = true,
+  }: {
+    tabArr: Array<Object>;
+    show?: boolean;
+    eventType: string;
+    setEventType: Function;
+  }) => {
+    return (
+      <View
+        style={[
+          styles.tab,
+          !show && {
+            display: 'none',
+          },
+        ]}
+      >
+        {tabArr.map(({text, type}, index: number) => {
+          const SelectIcon = typeIconMap[type];
+          const UnSelectIcon = typeIconMap['un' + type];
+          return (
+            <TouchableOpacity
+              key={index}
+              onPress={() => {
+                setEventType(type);
+              }}
+            >
+              <View style={[styles.tabDetail, styles.tabBorder]}>
+                {eventType === type && <SelectIcon style={styles.tabImg} />}
+                {eventType !== type && <UnSelectIcon style={styles.tabImg} />}
+                <Text
+                  style={[
+                    styles.tabText,
+                    eventType === type && {color: GREEN_TEXT},
+                  ]}
+                >
+                  {text}
+                </Text>
+              </View>
+            </TouchableOpacity>
+          );
+        })}
       </View>
-    </TouchableOpacity>
-  );
-}
+    );
+  }
+);
 
 const styles = StyleSheet.create({
   tab: {
@@ -74,10 +91,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingTop: 13,
     paddingBottom: 13,
-    borderTopColor: '#E8E8E8',
+    borderTopColor: BORDER_COLOR,
     borderTopWidth: 1,
-    borderBottomColor: '#E8E8E8',
+    borderBottomColor: BORDER_COLOR,
     borderBottomWidth: 1,
+    zIndex: 4,
+    backgroundColor: BACK_WHITE,
   },
   tabDetail: {
     flexDirection: 'row',
@@ -86,7 +105,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   tabBorder: {
-    borderRightColor: '#E8E8E8',
+    borderRightColor: BORDER_COLOR,
     borderRightWidth: 1,
   },
   tabText: {
@@ -99,3 +118,5 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
 });
+
+export default Tabbar;

@@ -4,28 +4,35 @@
 
 import React from 'react';
 import {Text, View, Image, StyleSheet} from 'react-native';
-import {calDurationText} from '../../../utils/public';
+import {calDurationText} from '../../../utils/formatTime';
 import {detail} from '../../../types/types';
+import {
+  TEXT_NORMAL,
+  tagWrapper,
+  tagText,
+  titleText,
+  TEXT_GREY,
+} from '../../../styles';
 
-interface DetailTopProps {
+export default function DetailTop({
+  show,
+  detail,
+}: {
   show: boolean;
   detail: detail;
-}
-
-export default function DetailTop(props: DetailTopProps) {
-  const {detail} = props;
+}) {
   return (
     <View
       style={[
         styles.contantContainer,
-        !props.show && {
+        !show && {
           display: 'none',
         },
       ]}
     >
       <View style={styles.ItemTopTagWrapper}>
-        <View style={styles.ItemTopTag}>
-          <Text style={styles.ItemTopTagText}>
+        <View style={styles.tagWrapper}>
+          <Text style={styles.tagText}>
             {detail.channel && detail.channel.name}
           </Text>
         </View>
@@ -54,29 +61,16 @@ export default function DetailTop(props: DetailTopProps) {
 }
 
 const styles = StyleSheet.create({
+  tagWrapper,
+  tagText,
   contantContainer: {
     padding: 16,
   },
   ItemTopTagWrapper: {
     flexDirection: 'row',
   },
-  ItemTopTag: {
-    borderWidth: 1,
-    borderColor: '#D3C1E5',
-    borderRadius: 20,
-    paddingLeft: 10,
-    paddingRight: 10,
-    height: 20,
-  },
-  ItemTopTagText: {
-    lineHeight: 18,
-    color: '#8560A9',
-    fontSize: 12,
-  },
   ItemTitleText: {
-    color: '#453257',
-    fontSize: 18,
-    fontWeight: 'bold',
+    ...titleText,
     paddingTop: 12,
     paddingBottom: 24,
   },
@@ -85,12 +79,12 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
   },
   writerTime: {
-    color: '#BABABA',
+    color: TEXT_GREY,
     fontSize: 12,
     paddingTop: 4,
   },
   writerUsername: {
-    color: '#67616D',
+    color: TEXT_NORMAL,
     fontSize: 14,
   },
   ItemTopAvatar: {

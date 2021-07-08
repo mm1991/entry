@@ -1,0 +1,7 @@
+{
+  "extends": "./node_modules/gts/",
+  "plugins": ["i18next"],
+  "rules": {
+    "i18next/no-literal-string": 2
+  }
+}

@@ -1,3 +1,7 @@
+/**
+ * 计算时间显示格式
+ */
+
 // 日期一位时首位补齐0
 function padZero(val: number) {
   return val.toString().padStart(2, '0');
@@ -88,7 +92,7 @@ interface rangeType {
 export const transTimeToString = (range: rangeType) => {
   const start = getLocalTime(range.before);
   const end = getLocalTime(range.after);
-  return `from ${padZero(start.getDate())}/${padZero(
-    start.getMonth() + 1
-  )} to ${padZero(end.getDate())}/${padZero(end.getMonth() + 1)}`;
+  return `from ${padZero(end.getDate())}/${padZero(
+    end.getMonth() + 1
+  )} to ${padZero(start.getDate())}/${padZero(start.getMonth() + 1)}`;
 };

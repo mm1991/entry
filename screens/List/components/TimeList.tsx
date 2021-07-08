@@ -5,22 +5,24 @@
 import React, {useState} from 'react';
 import {Text, View, StyleSheet} from 'react-native';
 import {selectTime} from '../../../globalConfig';
-import {formatDatePicker} from '../../../utils/public';
+import {formatDatePicker} from '../../../utils/formatTime';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import DateFrom from '../../../assets/images/date-from.svg';
 import DateTo from '../../../assets/images/date-to.svg';
 import {Observer, useLocalObservable} from 'mobx-react';
 import {stores} from '../../../store';
+import {PURPLE, TEXT_PURPLE, BACK_WHITE, ACTIVE_GREEN} from '../../../styles';
 
-interface timeListProps {
+export default function TimeList({
+  seleced,
+  onSelectTime,
+}: {
   seleced: number;
   onSelectTime: Function;
-}
-
-export default function TimeList(props: timeListProps) {
+}) {
   const store = useLocalObservable(() => stores);
   // 是否选中LATER
-  const [showSelect, setShowSelct] = useState(props.seleced === 5);
+  const [showSelect, setShowSelct] = useState(seleced === 5);
   // 是否展示日期选择器
   const [showPicker, setShowPicker] = useState(false);
   // 当前选中日期
@@ -40,29 +42,24 @@ export default function TimeList(props: timeListProps) {
       // 设置LATER结束时间
       store.setEndTime(new Date(currentDate).getTime());
     }
-    props.onSelectTime(5);
+    onSelectTime(5);
   };
   const channelNodes = selectTime.map(times => {
     return (
       <View
         style={[
           styles.labelContainer,
-          props.seleced === times.id && {
-            backgroundColor: '#E5F7A9',
-          },
+          seleced === times.id && styles.selectLabelBackActive,
         ]}
         key={times.id}
       >
         <Text
           style={[
             styles.selectLabel,
-            props.seleced === times.id && {
-              color: '#453257',
-              fontWeight: 'bold',
-            },
+            seleced === times.id && styles.selectLabelActive,
           ]}
           onPress={() => {
-            props.onSelectTime(times.id);
+            onSelectTime(times.id);
             setShowSelct(times.id === 5);
           }}
         >
@@ -76,14 +73,14 @@ export default function TimeList(props: timeListProps) {
       {() => (
         <View>
           <View style={styles.selectLabelWrapper}>{channelNodes}</View>
-          {showSelect && props.seleced === 5 && (
+          {showSelect && seleced === 5 && (
             <View style={styles.dateSelectWrapper}>
               <View style={styles.dateSelectSubWrapper}>
                 <DateFrom style={styles.dateImage} />
                 <Text
                   style={[
                     styles.dateText,
-                    showPicker && startShow && {backgroundColor: '#E5F7A9'},
+                    showPicker && startShow && styles.selectLabelBackActive,
                   ]}
                   onPress={() => {
                     if (!showPicker) {
@@ -102,7 +99,7 @@ export default function TimeList(props: timeListProps) {
                 <Text
                   style={[
                     styles.dateText,
-                    showPicker && !startShow && {backgroundColor: '#E5F7A9'},
+                    showPicker && !startShow && styles.selectLabelBackActive,
                   ]}
                   onPress={() => {
                     if (!showPicker) {
@@ -152,6 +149,13 @@ const styles = StyleSheet.create({
     paddingLeft: 7,
     paddingRight: 7,
   },
+  selectLabelActive: {
+    color: PURPLE,
+    fontWeight: 'bold',
+  },
+  selectLabelBackActive: {
+    backgroundColor: ACTIVE_GREEN,
+  },
   datePicker: {
     width: 250,
     height: 200,
@@ -168,7 +172,7 @@ const styles = StyleSheet.create({
   },
   dateSelectWrapper: {
     flexDirection: 'row',
-    backgroundColor: '#fff',
+    backgroundColor: BACK_WHITE,
     marginRight: 16,
     height: 38,
     justifyContent: 'center',
@@ -176,7 +180,7 @@ const styles = StyleSheet.create({
     marginTop: -5,
   },
   dateText: {
-    color: '#8560A9',
+    color: TEXT_PURPLE,
     lineHeight: 20,
     marginLeft: 6,
   },
